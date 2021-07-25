@@ -1,12 +1,23 @@
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen } from '@fortawesome/free-solid-svg-icons';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import './style.css';
 import TodoItem from './TodoItem';
+
+const getLocalItem =()=>{
+    let list =localStorage.getItem('lists');
+
+    if(list){
+        return JSON.parse(localStorage.getItem('lists'));
+    }else{
+        return [];
+    }
+
+}
 function Todo() {
     const [inputList, setInputList]=useState("");
-    const [Item, setItem]=useState([]);
+    const [item, setItem]=useState(getLocalItem());
     const [tempId, setTempId]=useState("");
     const [isUpdating, setIsUpdateting ]=useState(false);
     const setItems=(event)=>{
@@ -28,13 +39,13 @@ function Todo() {
     };
     const updateItem=(id)=>{
         setIsUpdateting(true);
-        setInputList(Item[id]);
+        setInputList(item[id]);
         setTempId(id);
         
     }
     const updateTodo=()=>{
-        Item[tempId]=inputList;
-        console.log(Item);
+        item[tempId]=inputList;
+        console.log(item);
         setTempId("");
         setInputList("");
         setIsUpdateting(false);
@@ -51,6 +62,9 @@ function Todo() {
             
         }
     }
+    useEffect(() => {
+        localStorage.setItem('lists',JSON.stringify(item))
+    }, [item]);
     
     return (
         <>
@@ -65,7 +79,7 @@ function Todo() {
                     <FontAwesomeIcon className='update' icon={faPen} onClick={updateTodo} />
                 
                 <ol>
-                    {Item.map((itemval, index)=>{
+                    {item.map((itemval, index)=>{
                         return <TodoItem key={index} id={index} text={itemval} onSelect={deleteItem } onSelectItem={updateItem} />;
                     })}
                 </ol>
